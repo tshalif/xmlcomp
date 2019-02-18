@@ -24,6 +24,7 @@ Usage
      Usage: ./xmlcomp.sh [-t] [-p ELEMENT-NAME[,..]|*] <xml1> <xml2>
 
         options:
+        -a  compare attributes
         -t  diff element content - otherwise only missing elements will be reported
         -p  comma-separated list of element names which should be
             compared with strict positioning. 
