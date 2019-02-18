@@ -13,6 +13,7 @@
 
   <xsl:param name="strict-positioning"/>
   <xsl:param name="text-diff" select="0"/>
+  <xsl:param name="attributes" select="0"/>
 
   <xsl:variable name="strict-pos" select="str:split($strict-positioning, ',')"/>
 
@@ -25,6 +26,11 @@
   </xsl:template>
 
 
+  <xsl:template match="@*">
+    <xsl:param name="base-path"/>
+    <xsl:value-of select="f:diff(concat($base-path, '/@', name()), 1)"/>
+  </xsl:template>
+  
   <xsl:template match="*">
     <xsl:param name="base-path"/>
     <xsl:variable name="local-name" select="local-name()"/>
@@ -42,6 +48,12 @@
 
     <xsl:value-of select="f:diff($path)"/>
 
+    <xsl:if test="$attributes">
+      <xsl:apply-templates select="@*">
+        <xsl:with-param name="base-path" select="$path"/>
+      </xsl:apply-templates>
+    </xsl:if>
+    
     <xsl:apply-templates select="*">
       <xsl:with-param name="base-path" select="$path"/>
     </xsl:apply-templates>    
@@ -49,6 +61,7 @@
 
   <func:function name="f:diff">
     <xsl:param name="path"/>
+    <xsl:param name="isattr"/>
 
     <xsl:variable name="ref-el" select="dyn:evaluate(concat('$ref', $path))"/>
 
@@ -57,9 +70,9 @@
         <xsl:when test="not($ref-el)">error: missing <xsl:value-of select="$path"/><xsl:text>
 </xsl:text></xsl:when>
         <xsl:otherwise>
-          <xsl:if test="$text-diff and text() != $ref-el/text()">warning: content <xsl:value-of select="$path"/>:<xsl:text>
-</xsl:text> --- <xsl:value-of select="$ref-el"/><xsl:text>
-</xsl:text> +++ <xsl:value-of select="."/><xsl:text>
+          <xsl:if test="$text-diff and (text() != $ref-el/text() or ($isattr and . != $ref-el))">warning: content <xsl:value-of select="$path"/>:<xsl:text>
+</xsl:text> --- <xsl:value-of select="."/><xsl:text>
+</xsl:text> +++ <xsl:value-of select="$ref-el"/><xsl:text>
 </xsl:text>
           </xsl:if>
         </xsl:otherwise>
