@@ -30,4 +30,7 @@ shift $((OPTIND - 1))
 
 test $# -eq 2 || usage_exit
 
-xsltproc --stringparam compare "$2" --stringparam strict-positioning "$strict_positioning" --param text-diff $diff --param attributes $attributes $(dirname $0)/xmlcomp.xsl "$1"
+xml1=$(readlink -f "$1")
+xml2=$(readlink -f "$2")
+
+xsltproc --stringparam compare "$xml2" --stringparam strict-positioning "$strict_positioning" --param text-diff $diff --param attributes $attributes $(dirname $0)/xmlcomp.xsl "$xml1"
